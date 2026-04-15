@@ -988,7 +988,8 @@ write_mtree_entry(struct archive_write *a, struct mtree_entry *me)
 		 * a full pathname.
 		 */
 		mtree_quote(str, me->parentdir.s);
-		archive_strappend_char(str, '/');
+		if (strcmp(me->basename.s, ".") != 0)
+			archive_strappend_char(str, '/');
 	}
 	mtree_quote(str, me->basename.s);
 
