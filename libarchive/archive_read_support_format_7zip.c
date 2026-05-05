@@ -3767,15 +3767,9 @@ setup_decode_folder(struct archive_read *a, struct _7z_folder *folder,
 	}
 
 	/*
-	 * Initialize a stream reader.
-	 */
-	zip->pack_stream_remaining = (unsigned)folder->numPackedStreams;
-	zip->pack_stream_index = (unsigned)folder->packIndex;
-	zip->folder_outbytes_remaining = folder_uncompressed_size(folder);
-	zip->uncompressed_buffer_bytes_remaining = 0;
-
-	/*
-	 * Check coder types.
+	 * Check coder types before modifying any stream-reader state, so that
+	 * an early return leaves zip unchanged (avoids partially-initialized
+	 * state that callers would have to reason about).
 	 */
 	for (i = 0; i < folder->numCoders; i++) {
 		switch(folder->coders[i].codec) {
@@ -3815,6 +3809,14 @@ setup_decode_folder(struct archive_read *a, struct _7z_folder *folder,
 		    "but currently not supported", cname);
 		return (ARCHIVE_FATAL);
 	}
+
+	/*
+	 * Initialize a stream reader.
+	 */
+	zip->pack_stream_remaining = (unsigned)folder->numPackedStreams;
+	zip->pack_stream_index = (unsigned)folder->packIndex;
+	zip->folder_outbytes_remaining = folder_uncompressed_size(folder);
+	zip->uncompressed_buffer_bytes_remaining = 0;
 	coder1 = &(folder->coders[0]);
 	if (folder->numCoders == 2)
 		coder2 = &(folder->coders[1]);
