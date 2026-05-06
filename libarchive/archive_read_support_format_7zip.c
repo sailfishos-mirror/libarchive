@@ -1038,6 +1038,13 @@ archive_read_format_7zip_read_header(struct archive_read *a,
 		unsigned char *symname = NULL;
 		size_t symsize = 0;
 
+		if (zip->entry_bytes_remaining > 1024 * 1024) {
+			archive_set_error(&a->archive, ENOMEM,
+			    "Rejecting malformed 7zip archive: "
+			    "symlink contents exceed 1 megabyte");
+			return (ARCHIVE_FATAL);
+		}
+
 		/*
 		 * Symbolic-name is recorded as its contents. We have to
 		 * read the contents at this time.
@@ -2837,7 +2844,7 @@ read_Header(struct archive_read *a, struct _7z_header_info *h,
 
 		if (parse_7zip_uint64(a, &size) < 0)
 			return (-1);
-		if (zip->header_bytes_remaining < size)
+		if (zip->header_bytes_remaining < size || size > SIZE_MAX / 4)
 			return (-1);
 		ll = (size_t)size;
 
@@ -3837,6 +3844,7 @@ setup_decode_folder(struct archive_read *a, struct _7z_folder *folder,
 		ssize_t bytes;
 		unsigned char *b[3] = {NULL, NULL, NULL};
 		uint64_t sunpack[3] ={-1, -1, -1};
+		uint64_t remaining;
 		size_t s[3] = {0, 0, 0};
 		int idx[3] = {0, 1, 2};
 
@@ -3891,12 +3899,14 @@ setup_decode_folder(struct archive_read *a, struct _7z_folder *folder,
 			coder2 = &(fc[3]);
 			zip->main_stream_bytes_remaining =
 				(size_t)folder->unPackSize[2];
+			remaining = folder->unPackSize[2];
 		} else if (coder2 != NULL && coder2->codec == _7Z_X86_BCJ2 &&
 		    zip->pack_stream_remaining == 4 &&
 		    folder->numInStreams == 5 && folder->numOutStreams == 2) {
 			/* Source type 0 made by 7z */
 			zip->main_stream_bytes_remaining =
 				(size_t)folder->unPackSize[0];
+			remaining = folder->unPackSize[0];
 		} else {
 			/* We got an unexpected form. */
 			archive_set_error(&(a->archive),
@@ -3904,6 +3914,15 @@ setup_decode_folder(struct archive_read *a, struct _7z_folder *folder,
 			    "Unsupported form of BCJ2 streams");
 			return (ARCHIVE_FATAL);
 		}
+		if (remaining > SIZE_MAX) {
+			archive_set_error(&(a->archive),
+			    ARCHIVE_ERRNO_MISC,
+			    "7-Zip sub-stream size exceeds "
+			    "platform maximum");
+			return (ARCHIVE_FATAL);
+		}
+		zip->main_stream_bytes_remaining = remaining;
+
 
 		/* Skip the main stream at this time. */
 		if ((r = seek_pack(a)) < 0)
@@ -3935,6 +3954,14 @@ setup_decode_folder(struct archive_read *a, struct _7z_folder *folder,
 
 			/* Allocate memory for the decoded data of a sub
 			 * stream. */
+			if (zip->folder_outbytes_remaining > SIZE_MAX) {
+				free(b[0]); free(b[1]); free(b[2]);
+				archive_set_error(&a->archive,
+				    ARCHIVE_ERRNO_MISC,
+				    "7-Zip sub-stream size exceeds "
+				    "platform maximum");
+				return (ARCHIVE_FATAL);
+			}
 			b[i] = malloc((size_t)zip->folder_outbytes_remaining);
 			if (b[i] == NULL) {
 				free(b[0]); free(b[1]); free(b[2]);
