@@ -39,7 +39,6 @@ DEFINE_TEST(test_read_format_rar5_bad_tables)
 	const void *buf;
 	size_t size;
 	la_int64_t offset;
-	int r;
 
 	extract_reference_file(reffile);
 	assert((a = archive_read_new()) != NULL);
