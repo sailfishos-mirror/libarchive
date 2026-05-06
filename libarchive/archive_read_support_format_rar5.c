@@ -2647,6 +2647,15 @@ static int create_decode_tables(uint8_t* bit_length,
 		upper_limit <<= 1;
 	}
 
+	/* Verify the code-length distribution is not over-subscribed.
+	 * After the loop above, upper_limit == sum(lc[i] * 2^(16-i)).
+	 * For a valid prefix-free code this must be <= 2^16 = 65536.
+	 * An over-subscribed table (> 65536) cannot produce a valid
+	 * decode table and must be rejected. */
+	if(upper_limit > 65536) {
+		return ARCHIVE_FAILED;
+	}
+
 	memcpy(decode_pos_clone, table->decode_pos, sizeof(decode_pos_clone));
 
 	for(i = 0; i < size; i++) {
