@@ -376,35 +376,33 @@ MACRO (GENERATE_LIST_H _listfile _cmlist _target __list_sources)
 ENDMACRO (GENERATE_LIST_H)
 
 #
+# Register individual tests with CTest by scanning DEFINE_TEST() declarations.
 #
-#
-MACRO(DISCOVER_TESTS _component __list_sources)
+MACRO (DISCOVER_TESTS _component __list_sources)
   IF(ENABLE_TEST)
     SET(_sources ${ARGV})
     LIST(REMOVE_AT _sources 0)
-    FOREACH(_src ${_sources})
-      IF(_src MATCHES "test_[^/]+\\.c$")
+    FOREACH (_src ${_sources})
+      IF (_src MATCHES "test_[^/]+\\.c$")
         FILE(STRINGS "${_src}" _lines REGEX "^DEFINE_TEST\(.*\)")
-        FOREACH(_line ${_lines})
-	  STRING(REGEX MATCH "DEFINE_TEST\((.*)\)" _full_match ${_line})
-	  # CMake REGEX seems to handle ( and \( rather inconsistently...
-	  # So we go through an extra dance to definitively strip the parens
-	  STRING(REPLACE "(" "" _test_name_with_paren "${CMAKE_MATCH_1}")
-	  STRING(REPLACE ")" "" _test_name "${_test_name_with_paren}")
-	  SET(_full_test_name "${_component}_${_test_name}")
-          MESSAGE("Found test ${_full_test_name} command ${_component}_test")
-	  ADD_TEST(NAME ${_full_test_name}
-	           COMMAND ${_component}_test -vv
-	                             -r ${CMAKE_CURRENT_SOURCE_DIR}
-				     -s
-				     ${_test_name})
-	  SET_TESTS_PROPERTIES(${_full_test_name} PROPERTIES SKIP_RETURN_CODE 2)
-
-        ENDFOREACH()
-      ENDIF()
-    endforeach()
+        FOREACH (_line ${_lines})
+          STRING(REGEX MATCH "DEFINE_TEST\((.*)\)" _full_match ${_line})
+          # CMake REGEX seems to handle ( and \( rather inconsistently...
+          # So we go through an extra dance to definitively strip the parens
+          STRING(REPLACE "(" "" _test_name_with_paren "${CMAKE_MATCH_1}")
+          STRING(REPLACE ")" "" _test_name "${_test_name_with_paren}")
+          SET(_full_test_name "${_component}_${_test_name}")
+          ADD_TEST(NAME ${_full_test_name}
+                   COMMAND ${_component}_test -vv
+                                   -r ${CMAKE_CURRENT_SOURCE_DIR}
+                                   -s
+                                   ${_test_name})
+          SET_TESTS_PROPERTIES(${_full_test_name} PROPERTIES SKIP_RETURN_CODE 2)
+        ENDFOREACH (_line)
+      ENDIF (_src MATCHES "test_[^/]+\\.c$")
+    ENDFOREACH (_src)
   ENDIF(ENABLE_TEST)
-ENDMACRO(DISCOVER_TESTS __sources)
+ENDMACRO (DISCOVER_TESTS __list_sources)
 
 #
 # Generate installation rules for man pages.
