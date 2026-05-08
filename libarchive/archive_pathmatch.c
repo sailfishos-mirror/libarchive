@@ -220,7 +220,7 @@ pm(const char *p, const char *s, int flags)
 			}
 			if (*end == ']') {
 				/* We found [...], try to match it. */
-				if (!pm_list(p + 1, end, *s, flags))
+				if (*s == '\0' || !pm_list(p + 1, end, *s, flags))
 					return (0);
 				p = end; /* Jump to trailing ']' char. */
 				break;

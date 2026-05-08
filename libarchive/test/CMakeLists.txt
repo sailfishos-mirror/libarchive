@@ -29,6 +29,7 @@ IF(ENABLE_TEST)
     test_archive_match_time.c
     test_archive_parse_date.c
     test_archive_pathmatch.c
+    test_archive_pathmatch_oob.c
     test_archive_read.c
     test_archive_read_add_passphrase.c
     test_archive_read_close_twice.c

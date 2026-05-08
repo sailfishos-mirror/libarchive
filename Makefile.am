@@ -397,6 +397,7 @@ libarchive_test_SOURCES= \
 	libarchive/test/test_archive_match_time.c \
 	libarchive/test/test_archive_parse_date.c \
 	libarchive/test/test_archive_pathmatch.c \
+	libarchive/test/test_archive_pathmatch_oob.c \
 	libarchive/test/test_archive_read.c \
 	libarchive/test/test_archive_read_add_passphrase.c \
 	libarchive/test/test_archive_read_close_twice.c \
@@ -728,6 +729,8 @@ libarchive_test_EXTRA_DIST=\
 	libarchive/test/test_acl_pax_posix1e.tar.uu \
 	libarchive/test/test_acl_pax_nfs4.tar.uu \
 	libarchive/test/test_archive_string_conversion.txt.Z.uu \
+	libarchive/test/test_archive_pathmatch_oob_bracket.bin.uu \
+	libarchive/test/test_archive_pathmatch_oob_strchr.bin.uu \
 	libarchive/test/test_compat_bzip2_1.tbz.uu \
 	libarchive/test/test_compat_bzip2_2.tbz.uu \
 	libarchive/test/test_compat_cpio_1.cpio.uu \
