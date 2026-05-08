@@ -684,6 +684,7 @@ libarchive_test_SOURCES= \
 	libarchive/test/test_write_format_warc.c \
 	libarchive/test/test_write_format_warc_empty.c \
 	libarchive/test/test_write_format_xar.c \
+	libarchive/test/test_write_format_xar_bugs.c \
 	libarchive/test/test_write_format_xar_empty.c \
 	libarchive/test/test_write_format_zip.c \
 	libarchive/test/test_write_format_zip64_stream.c \
@@ -726,6 +727,7 @@ libarchive_TESTS_ENVIRONMENT= LIBARCHIVE_TEST_FILES=`cd $(top_srcdir);/bin/pwd`/
 
 libarchive_test_EXTRA_DIST=\
 	libarchive/test/list.h \
+	libarchive/test/test_fuzz_consumer.h \
 	libarchive/test/test_acl_pax_posix1e.tar.uu \
 	libarchive/test/test_acl_pax_nfs4.tar.uu \
 	libarchive/test/test_archive_string_conversion.txt.Z.uu \
@@ -1121,6 +1123,8 @@ libarchive_test_EXTRA_DIST=\
 	libarchive/test/test_write_disk_hfs_compression.tgz.uu \
 	libarchive/test/test_write_disk_mac_metadata.tar.gz.uu \
 	libarchive/test/test_write_disk_no_hfs_compression.tgz.uu \
+	libarchive/test/test_write_format_xar_strcpy_overlap.bin.uu \
+	libarchive/test/test_write_format_xar_underflow.bin.uu \
 	libarchive/test/CMakeLists.txt \
 	libarchive/test/README
 
