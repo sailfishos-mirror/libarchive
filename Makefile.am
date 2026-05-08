@@ -660,6 +660,7 @@ libarchive_test_SOURCES= \
 	libarchive/test/test_write_format_gnutar_filenames.c \
 	libarchive/test/test_write_format_iso9660.c \
 	libarchive/test/test_write_format_iso9660_boot.c \
+	libarchive/test/test_write_format_iso9660_bugs.c \
 	libarchive/test/test_write_format_iso9660_empty.c \
 	libarchive/test/test_write_format_iso9660_filename.c \
 	libarchive/test/test_write_format_iso9660_zisofs.c \
@@ -1123,6 +1124,9 @@ libarchive_test_EXTRA_DIST=\
 	libarchive/test/test_write_disk_hfs_compression.tgz.uu \
 	libarchive/test/test_write_disk_mac_metadata.tar.gz.uu \
 	libarchive/test/test_write_disk_no_hfs_compression.tgz.uu \
+	libarchive/test/test_write_format_iso9660_joliet_overflow.bin.uu \
+	libarchive/test/test_write_format_iso9660_null_deref.bin.uu \
+	libarchive/test/test_write_format_iso9660_underflow.bin.uu \
 	libarchive/test/test_write_format_xar_strcpy_overlap.bin.uu \
 	libarchive/test/test_write_format_xar_underflow.bin.uu \
 	libarchive/test/CMakeLists.txt \

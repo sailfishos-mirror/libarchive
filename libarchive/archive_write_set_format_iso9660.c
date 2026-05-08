@@ -4281,9 +4281,11 @@ _write_path_table(struct archive_write *a, int type_m, int depth,
 			set_num_731(bp+3, np->dir_location);
 		/* Parent Directory Number */
 		if (type_m)
-			set_num_722(bp+7, np->parent->dir_number);
+			set_num_722(bp+7,
+			    np->parent != NULL ? np->parent->dir_number : 0);
 		else
-			set_num_721(bp+7, np->parent->dir_number);
+			set_num_721(bp+7,
+			    np->parent != NULL ? np->parent->dir_number : 0);
 		/* Directory Identifier */
 		if (np->identifier == NULL)
 			bp[9] = 0;
@@ -5914,10 +5916,21 @@ idr_extend_identifier(struct idrent *wnp, int numsize, int nullsize)
 {
 	unsigned char *p;
 	int wnp_ext_off;
+	int new_id_len;
 
 	wnp_ext_off = wnp->isoent->ext_off;
 	if (wnp->noff + numsize != wnp_ext_off) {
-		p = (unsigned char *)wnp->isoent->identifier;
+		new_id_len = wnp->noff + numsize + wnp->isoent->ext_len;
+		/*
+		 * Reallocate the identifier buffer to fit the expanded
+		 * name.  Add extra space for a version suffix (";1")
+		 * that may be appended later.
+		 */
+		p = (unsigned char *)realloc(wnp->isoent->identifier,
+		    new_id_len + nullsize + numsize + 4);
+		if (p == NULL)
+			return;
+		wnp->isoent->identifier = (char *)p;
 		/* Extend the filename; foo.c --> foo___.c */
 		memmove(p + wnp->noff + numsize, p + wnp_ext_off,
 		    wnp->isoent->ext_len + nullsize);
@@ -6829,7 +6842,15 @@ _compare_path_table(const void *v1, const void *v2)
 	p2 = *((const struct isoent **)(uintptr_t)v2);
 
 	/* Compare parent directory number */
-	cmp = p1->parent->dir_number - p2->parent->dir_number;
+	if (p1->parent == NULL || p2->parent == NULL) {
+		if (p1->parent == p2->parent)
+			cmp = 0;
+		else if (p1->parent == NULL)
+			return (-1);
+		else
+			return (1);
+	} else
+		cmp = p1->parent->dir_number - p2->parent->dir_number;
 	if (cmp != 0)
 		return (cmp);
 
@@ -6872,7 +6893,15 @@ _compare_path_table_joliet(const void *v1, const void *v2)
 	p2 = *((const struct isoent **)(uintptr_t)v2);
 
 	/* Compare parent directory number */
-	cmp = p1->parent->dir_number - p2->parent->dir_number;
+	if (p1->parent == NULL || p2->parent == NULL) {
+		if (p1->parent == p2->parent)
+			cmp = 0;
+		else if (p1->parent == NULL)
+			return (-1);
+		else
+			return (1);
+	} else
+		cmp = p1->parent->dir_number - p2->parent->dir_number;
 	if (cmp != 0)
 		return (cmp);
 

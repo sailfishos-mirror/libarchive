@@ -26,6 +26,7 @@
 /*
  * C99 equivalent of the DataConsumer class used by the C++ fuzzers.
  * Consumes bytes sequentially from a buffer, matching the fuzzer protocol.
+ * Not all consumers use every function, so suppress unused warnings.
  */
 #ifndef TEST_FUZZ_CONSUMER_H
 #define TEST_FUZZ_CONSUMER_H
@@ -34,6 +35,12 @@
 #include <stddef.h>
 #include <string.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+#define FUZZ_UNUSED __attribute__((unused))
+#else
+#define FUZZ_UNUSED
+#endif
+
 struct fuzz_consumer {
 	const uint8_t *data;
 	size_t size;
@@ -41,7 +48,7 @@ struct fuzz_consumer {
 	char string_buf[512];
 };
 
-static void
+FUZZ_UNUSED static void
 fuzz_consumer_init(struct fuzz_consumer *c, const uint8_t *data, size_t size)
 {
 	c->data = data;
@@ -49,13 +56,13 @@ fuzz_consumer_init(struct fuzz_consumer *c, const uint8_t *data, size_t size)
 	c->pos = 0;
 }
 
-static size_t
+FUZZ_UNUSED static size_t
 fuzz_consumer_remaining(const struct fuzz_consumer *c)
 {
 	return c->size - c->pos;
 }
 
-static uint8_t
+FUZZ_UNUSED static uint8_t
 fuzz_consume_byte(struct fuzz_consumer *c)
 {
 	if (c->pos >= c->size)
@@ -63,7 +70,7 @@ fuzz_consume_byte(struct fuzz_consumer *c)
 	return c->data[c->pos++];
 }
 
-static uint16_t
+FUZZ_UNUSED static uint16_t
 fuzz_consume_u16(struct fuzz_consumer *c)
 {
 	uint16_t val = 0;
@@ -75,7 +82,7 @@ fuzz_consume_u16(struct fuzz_consumer *c)
 	return val;
 }
 
-static uint32_t
+FUZZ_UNUSED static uint32_t
 fuzz_consume_u32(struct fuzz_consumer *c)
 {
 	uint32_t val = 0;
@@ -89,7 +96,7 @@ fuzz_consume_u32(struct fuzz_consumer *c)
 	return val;
 }
 
-static int64_t
+FUZZ_UNUSED static int64_t
 fuzz_consume_i64(struct fuzz_consumer *c)
 {
 	int64_t val = 0;
@@ -102,7 +109,7 @@ fuzz_consume_i64(struct fuzz_consumer *c)
 	return val;
 }
 
-static const char *
+FUZZ_UNUSED static const char *
 fuzz_consume_string(struct fuzz_consumer *c, size_t max_len)
 {
 	size_t avail, len, actual_len;
@@ -121,7 +128,7 @@ fuzz_consume_string(struct fuzz_consumer *c, size_t max_len)
 	return c->string_buf;
 }
 
-static size_t
+FUZZ_UNUSED static size_t
 fuzz_consume_bytes(struct fuzz_consumer *c, void *out, size_t len)
 {
 	size_t avail = c->size - c->pos;
