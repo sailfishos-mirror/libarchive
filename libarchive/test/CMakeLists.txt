@@ -183,6 +183,7 @@ IF(ENABLE_TEST)
     test_read_format_rar5_loop_bug.c
     test_read_format_raw.c
     test_read_format_tar.c
+    test_read_format_tar_acl_oob_read.c
     test_read_format_tar_V_negative_size.c
     test_read_format_tar_concatenated.c
     test_read_format_tar_empty_filename.c
