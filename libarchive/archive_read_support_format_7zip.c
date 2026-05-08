@@ -4311,7 +4311,7 @@ sparc_Convert(struct _7zip *zip, uint8_t *buf, size_t size)
 	size &= ~(size_t)3;
 
 	for (i = 0; i < size; i += 4) {
-		instr = (uint32_t)(buf[i] << 24)
+		instr = ((uint32_t)buf[i] << 24)
 			| ((uint32_t)buf[i+1] << 16)
 			| ((uint32_t)buf[i+2] << 8)
 			| (uint32_t)buf[i+3];
