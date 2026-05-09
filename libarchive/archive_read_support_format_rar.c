@@ -124,6 +124,7 @@
 #define NS_UNIT 10000000
 
 #define DICTIONARY_MAX_SIZE 0x400000
+#define RAR_MAX_NEWSUB_SIZE (1024 * 1024)
 
 #define MAINCODE_SIZE      299
 #define OFFSETCODE_SIZE    60
@@ -1513,27 +1514,20 @@ read_header(struct archive_read *a, struct archive_entry *entry,
    * consumed at the end.
    */
   if (head_type == NEWSUB_HEAD) {
-    size_t distance = p - (const char *)h;
-    if (rar->packed_size > INT64_MAX - header_size) {
+    if (rar->packed_size > RAR_MAX_NEWSUB_SIZE ||
+        rar->packed_size > INT64_MAX - header_size) {
       archive_set_error(&a->archive, ARCHIVE_ERRNO_FILE_FORMAT,
-                        "Extended header size too large");
+                        "Invalid RAR file: Overlarge extended header");
       return (ARCHIVE_FATAL);
     }
-    header_size += rar->packed_size;
-    if ((uintmax_t)header_size > SIZE_MAX) {
+    if (__archive_read_consume(a, header_size + rar->packed_size - 7) < 0) {
       archive_set_error(&a->archive, ARCHIVE_ERRNO_FILE_FORMAT,
-                        "Unable to read extended header data");
+                        "Invalid RAR file: Cannot read extended header data");
       return (ARCHIVE_FATAL);
     }
-    /* Make sure we have the extended data. */
-    if ((h = __archive_read_ahead(a, (size_t)header_size - 7, NULL)) == NULL) {
-      archive_set_error(&a->archive, ARCHIVE_ERRNO_FILE_FORMAT,
-                        "Failed to read extended header data");
-      return (ARCHIVE_FATAL);
-    }
-    p = h;
-    endp = p + header_size - 7;
-    p += distance;
+
+    /* NEWSUB blocks are metadata-only here; skip them without creating an entry. */
+    return ret;
   }
 
   filename_size = archive_le16dec(file_header.name_size);
@@ -1828,10 +1822,6 @@ read_header(struct archive_read *a, struct archive_entry *entry,
   __archive_ppmd7_functions.Ppmd7_Free(&rar->ppmd7_context);
   rar->ppmd_valid = rar->ppmd_eod = 0;
   rar->filters.filterstart = INT64_MAX;
-
-  /* Don't set any archive entries for non-file header types */
-  if (head_type == NEWSUB_HEAD)
-    return ret;
 
   archive_entry_set_mtime(entry, rar->mtime, rar->mnsec);
   archive_entry_set_ctime(entry, rar->ctime, rar->cnsec);
