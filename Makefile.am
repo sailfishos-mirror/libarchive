@@ -673,6 +673,7 @@ libarchive_test_SOURCES= \
 	libarchive/test/test_write_format_mtree_no_separator.c \
 	libarchive/test/test_write_format_mtree_preset_digests.c \
 	libarchive/test/test_write_format_mtree_quoted_filename.c\
+	libarchive/test/test_write_format_mtree_null_deref.c \
 	libarchive/test/test_write_format_pax.c \
 	libarchive/test/test_write_format_raw.c \
 	libarchive/test/test_write_format_raw_b64.c \
@@ -1127,6 +1128,7 @@ libarchive_test_EXTRA_DIST=\
 	libarchive/test/test_write_format_iso9660_joliet_overflow.bin.uu \
 	libarchive/test/test_write_format_iso9660_null_deref.bin.uu \
 	libarchive/test/test_write_format_iso9660_underflow.bin.uu \
+	libarchive/test/test_write_format_mtree_null_deref.bin.uu \
 	libarchive/test/test_write_format_xar_strcpy_overlap.bin.uu \
 	libarchive/test/test_write_format_xar_underflow.bin.uu \
 	libarchive/test/CMakeLists.txt \

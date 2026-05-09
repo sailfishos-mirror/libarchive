@@ -1146,6 +1146,8 @@ write_mtree_entry_tree(struct archive_write *a)
 	int ret;
 
 	do {
+		if (np->dir_info == NULL)
+			break;
 		if (mtree->output_global_set) {
 			/*
 			 * Collect attribute information to know which value
