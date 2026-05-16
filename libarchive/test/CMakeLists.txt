@@ -302,6 +302,7 @@ IF(ENABLE_TEST)
     test_write_format_mtree_absolute_path.c
     test_write_format_mtree_classic.c
     test_write_format_mtree_classic_indent.c
+    test_write_format_mtree_dotdot.c
     test_write_format_mtree_fflags.c
     test_write_format_mtree_no_separator.c
     test_write_format_mtree_preset_digests.c
