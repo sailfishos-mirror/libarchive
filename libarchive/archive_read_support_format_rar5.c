@@ -2561,7 +2561,7 @@ static int rar5_read_header(struct archive_read *a,
 	return ret;
 }
 
-static void init_unpack(struct rar5* rar) {
+static int init_unpack(struct rar5* rar) {
 	rar->file.calculated_crc32 = 0;
 	init_window_mask(rar);
 
@@ -2570,7 +2570,11 @@ static void init_unpack(struct rar5* rar) {
 
 	if(rar->cstate.window_size > 0) {
 		rar->cstate.window_buf = calloc(1, rar->cstate.window_size);
+		if(rar->cstate.window_buf == NULL)
+			return ARCHIVE_FATAL;
 		rar->cstate.filtered_buf = calloc(1, rar->cstate.window_size);
+		if(rar->cstate.filtered_buf == NULL)
+			return ARCHIVE_FATAL;
 	} else {
 		rar->cstate.window_buf = NULL;
 		rar->cstate.filtered_buf = NULL;
@@ -2586,6 +2590,7 @@ static void init_unpack(struct rar5* rar) {
 	memset(&rar->cstate.dd, 0, sizeof(rar->cstate.dd));
 	memset(&rar->cstate.ldd, 0, sizeof(rar->cstate.ldd));
 	memset(&rar->cstate.rd, 0, sizeof(rar->cstate.rd));
+	return ARCHIVE_OK;
 }
 
 static void update_crc(struct rar5* rar, const uint8_t* p, size_t to_read) {
@@ -3881,7 +3886,8 @@ static int do_uncompress_file(struct archive_read* a) {
 		/* Don't perform full context reinitialization if we're
 		 * processing a solid archive. */
 		if(!rar->main.solid || !rar->cstate.window_buf) {
-			init_unpack(rar);
+			if((ret = init_unpack(rar)) != ARCHIVE_OK)
+				return ret;
 		}
 
 		rar->cstate.initialized = 1;

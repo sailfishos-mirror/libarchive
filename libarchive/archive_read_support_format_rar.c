@@ -2840,6 +2840,10 @@ make_table(struct archive_read *a, struct huffman_code *code)
     code->tablesize = code->maxlength;
 
   code->table = calloc(((size_t)1U) << code->tablesize, sizeof(*code->table));
+  if (code->table == NULL) {
+    archive_set_error(&a->archive, ENOMEM, "Can't allocate memory");
+    return (ARCHIVE_FATAL);
+  }
 
   return make_table_recurse(a, code, 0, code->table, 0, code->tablesize);
 }
