@@ -467,6 +467,7 @@ libarchive_test_SOURCES= \
 	libarchive/test/test_read_disk_entry_from_file.c \
 	libarchive/test/test_read_extract.c \
 	libarchive/test/test_read_file_nonexistent.c \
+	libarchive/test/test_read_files_compressed.c \
 	libarchive/test/test_read_filter_compress.c \
 	libarchive/test/test_read_filter_grzip.c \
 	libarchive/test/test_read_filter_gzip_recursive.c \
@@ -819,6 +820,8 @@ libarchive_test_EXTRA_DIST=\
 	libarchive/test/test_rar_multivolume_uncompressed_files.part08.rar.uu \
 	libarchive/test/test_rar_multivolume_uncompressed_files.part09.rar.uu \
 	libarchive/test/test_rar_multivolume_uncompressed_files.part10.rar.uu \
+	libarchive/test/test_read_files_compressed.part01.uu \
+	libarchive/test/test_read_files_compressed.part02.uu \
 	libarchive/test/test_read_filter_grzip.tar.grz.uu \
 	libarchive/test/test_read_filter_gzip_recursive.gz.uu \
 	libarchive/test/test_read_filter_lrzip.tar.lrz.uu \
